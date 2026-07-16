@@ -1,0 +1,40 @@
+[
+  {
+    "clientId": 1,
+    "name": "John Smith",
+    "scmlCode": "000100",
+    "surgeryType": "Septoplasty",
+    "insuranceType": "MediCare Plus",
+    "locationId": 1,
+    "locationName": "Riverside",
+    "notes": "",
+    "clientDate": "2026-01-15T00:00:00Z",
+    "payments": [
+      { "paymentId": 1, "clientId": 1, "amount": 300, "paymentDate": "2026-01-10T00:00:00Z", "invoiceNumber": "INV-001" }
+    ]
+  },
+  {
+    "clientId": 2,
+    "name": "Mary Johnson",
+    "scmlCode": "000101",
+    "surgeryType": "Tonsillectomy",
+    "insuranceType": "HealthGuard",
+    "locationId": 1,
+    "locationName": "Riverside",
+    "notes": "",
+    "clientDate": "2026-02-10T00:00:00Z",
+    "payments": []
+  },
+  {
+    "clientId": 3,
+    "name": "Richard Turner",
+    "scmlCode": "000102",
+    "surgeryType": "Rhinoplasty",
+    "insuranceType": "WellPoint",
+    "locationId": 1,
+    "locationName": "Riverside",
+    "notes": "Urgent",
+    "clientDate": "2026-03-01T00:00:00Z",
+    "payments": []
+  }
+]

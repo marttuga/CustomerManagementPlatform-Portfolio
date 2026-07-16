@@ -1,0 +1,22 @@
+<!-- ==========================================================================
+     NAVBAR
+     Renders a button for the dashboard and one for each location.
+     routerLinkActive="active" automatically adds the "active" CSS class
+     when the button's route matches the current URL.
+     ========================================================================== -->
+<nav class="location-navbar">
+  <!-- Dashboard link -->
+  <button routerLink="/dashboard" routerLinkActive="active">Dashboard</button>
+
+  <!-- Client-model locations (show patient/client data) -->
+  <button routerLink="/locations/riverside"   routerLinkActive="active">Riverside</button>
+  <button routerLink="/locations/hillcrest" routerLinkActive="active">Hillcrest</button>
+  <button routerLink="/locations/oakdale"    routerLinkActive="active">Oakdale</button>
+
+  <!-- Daily-entry-model locations (show work date data) -->
+  <button routerLink="/locations/fairview"                   routerLinkActive="active">Fairview</button>
+  <button routerLink="/locations/northgate"               routerLinkActive="active">Northgate</button>
+  <button routerLink="/locations/sunview"                  routerLinkActive="active">Sunview</button>
+  <button routerLink="/locations/elmwood"   routerLinkActive="active">Elmwood</button>
+  <button routerLink="/locations/ashford"               routerLinkActive="active">Ashford</button>
+</nav>

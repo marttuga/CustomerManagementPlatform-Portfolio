@@ -1,0 +1,20 @@
+[
+  {
+    "dailyEntryId": 1,
+    "workDate": "2026-01-10T00:00:00Z",
+    "notes": "General Consultation",
+    "locationId": 4,
+    "locationName": "Fairview",
+    "payments": [
+      { "paymentId": 10, "clientId": null, "amount": 150, "paymentDate": "2026-01-10T00:00:00Z", "invoiceNumber": "INV-010" }
+    ]
+  },
+  {
+    "dailyEntryId": 2,
+    "workDate": "2026-01-12T00:00:00Z",
+    "notes": "",
+    "locationId": 4,
+    "locationName": "Fairview",
+    "payments": []
+  }
+]

@@ -1,0 +1,504 @@
+/* ==========================================================================
+   TABLE GENERIC
+   Styles for the reusable data table used on every location page.
+   This component handles: data display, inline editing, sorting,
+   search filtering, report generation and deletion modals.
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. TABLE WRAPPER & SCROLL CONTAINER
+   The outer card that holds everything. Uses flex column layout so the
+   table body scrolls internally without the header or controls moving.
+   ========================================================================== */
+
+/* Outer card - fills available vertical space minus the navbar height */
+.table-wrapper {
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  padding: 25px;
+  margin: 20px auto;
+  max-width: 98%;
+  width: 98%;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  max-height: calc(100vh - 145px); /* 145px = navbar + margins, keeps table on one screen */
+  position: relative;
+  overflow: hidden;  /* Clip overflow - actual scroll happens inside table-scroll-container */
+  box-sizing: border-box;
+}
+
+/* Inner scroll area - only this div scrolls, not the whole page */
+.table-scroll-container {
+  width: 100%;
+  overflow: auto;   /* Both axes scroll if content overflows */
+  margin-top: 20px;
+  flex-grow: 1;     /* Takes all remaining height below the header */
+  padding-bottom: 5px;
+  position: relative;
+}
+
+
+/* ==========================================================================
+   2. TABLE HEADER (Title + Controls Row)
+   The top bar inside the card showing the location title on the left
+   and the search input + action buttons on the right.
+   ========================================================================== */
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 0 5px;
+  flex-shrink: 0; /* Does not shrink - always visible above the scroll area */
+}
+
+.table-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e1e1e;
+  margin: 0;
+}
+
+
+/* ==========================================================================
+   3. CONTROLS (Search input + Report button + Add button)
+   ========================================================================== */
+
+/* Horizontal row of controls aligned to the right of the header */
+.controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  position: relative; /* Needed so the report popover positions relative to this */
+}
+
+/* Search input field */
+.controls input {
+  padding: 10px 15px;
+  border-radius: 10px;
+  border: 1.5px solid #ddd;
+  font-size: 14px;
+  width: 250px;
+  outline: none;
+}
+
+/* "Add Payment" blue button */
+.add-btn {
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.add-btn:hover {
+  background-color: #1565c0;
+  transform: translateY(-1px);
+}
+
+
+/* ==========================================================================
+   4. REPORT POPOVER
+   Floating balloon that appears when the "📊 Report" button is clicked.
+   Contains a month selector, year input and a Confirm button.
+   Positioned absolutely relative to .controls.
+   ========================================================================== */
+
+.report-popover {
+  position: absolute;
+  top: 50px;    /* Appears just below the button row */
+  right: 120px; /* Aligned near the Report button */
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  z-index: 1001; /* Above the table content */
+  display: flex;
+  flex-direction: column;
+  animation: popIn 0.2s ease-out;
+}
+
+/* Small triangular arrow pointing up toward the Report button */
+.report-popover::after {
+  content: "";
+  position: absolute;
+  top: -8px;
+  right: 25px;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid white;
+}
+
+/* Slide-in animation for the popover */
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Row inside the popover: month select + year input + confirm button */
+.popover-content {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Month dropdown inside the popover */
+.report-select {
+  min-width: 140px;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1.5px solid #ddd;
+  font-size: 13px;
+}
+
+/* Year number input inside the popover - intentionally narrow */
+.report-year-input {
+  width: 80px !important;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1.5px solid #ddd;
+  font-size: 13px;
+}
+
+/* Focus highlight for both report inputs */
+.report-select:focus,
+.report-year-input:focus {
+  border-color: #1976d2;
+}
+
+/* Green confirm button inside the popover */
+.confirm-report-btn {
+  background-color: #2ecc71 !important;
+  color: white;
+  padding: 8px 15px;
+  font-size: 13px;
+}
+
+
+/* ==========================================================================
+   5. TABLE CORE (thead + tbody)
+   The actual HTML table inside the scroll container.
+   Headers are sticky so they stay visible while scrolling.
+   ========================================================================== */
+
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  min-width: 1200px; /* Forces horizontal scroll on small screens */
+}
+
+/* Sticky column headers - stay at the top when the table body scrolls */
+.styled-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: #ffffff;
+  border-bottom: 2px solid #eee;
+  padding: 12px 10px;
+}
+
+/* Body cells */
+.styled-table td {
+  padding: 12px 10px;
+  font-size: 14px;
+  border-bottom: 1px solid #eee;
+}
+
+/* Flex container inside each header cell for label + sort arrows */
+.header-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* Column label text - clicking resets the sort */
+.header-label {
+  cursor: pointer;
+  font-weight: 600;
+  color: #666;
+  font-size: 14px;
+}
+
+/* Sort arrow buttons (▲ ▼) - dimmed by default */
+.arrow-btn {
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0.3;
+}
+
+/* Active sort arrow - highlighted in blue */
+.arrow-btn.active {
+  opacity: 1;
+  color: #1976d2;
+}
+
+
+/* ==========================================================================
+   6. INLINE EDIT MODE (Inputs & Selects inside table cells)
+   When a row is in edit mode, text cells become inputs and
+   dropdown cells become selects or custom multi-select dropdowns.
+   ========================================================================== */
+
+/* All inputs and selects inside table cells */
+.styled-table input,
+.styled-table select {
+  width: 100%;
+  padding: 8px;
+  border: 1.5px solid #ccc;
+  border-radius: 6px;
+  font-size: 13px;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+  background-color: #fff;
+}
+
+/* Blue border highlight on focus */
+.styled-table input:focus,
+.styled-table select:focus {
+  border-color: #1976d2;
+  outline: none;
+  box-shadow: 0 0 4px rgba(25, 118, 210, 0.1);
+}
+
+/* Date inputs are narrower than text inputs to avoid wasting space */
+.styled-table input[type="date"] {
+  max-width: 150px;
+}
+
+
+/* ==========================================================================
+   7. FEEDBACK MESSAGES & LOADING SPINNER
+   A green banner shown briefly after save/delete actions.
+   The spinner appears inside the Save and Report buttons while loading.
+   ========================================================================== */
+
+/* Green feedback banner - fades in and out automatically via animation */
+.message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  gap: 20px;
+  color: #2e7d32;
+  font-weight: 600;
+  margin-bottom: 20px;
+  background-color: #e8f5e9;
+  padding: 10px;
+  border-radius: 12px;
+  animation: fadeInOut 3s ease-in-out forwards;
+}
+
+/* Fade in → stay visible → fade out */
+@keyframes fadeInOut {
+  0%        { opacity: 0; transform: translateY(-10px); }
+  10%, 90%  { opacity: 1; transform: translateY(0); }
+  100%      { opacity: 0; transform: translateY(-10px); }
+}
+
+/* Circular loading spinner shown inside buttons during async operations */
+.spinner {
+  display: inline-block;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top: 2px solid #fff; /* Only the top border is white - creates the spin effect */
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
+/* ==========================================================================
+   8. ACTION BUTTONS (Edit, Save, Delete, Cancel, Report)
+   Used both in the table rows and inside the delete modal.
+   ========================================================================== */
+
+/* Column cell that holds the Edit/Delete or Save/Cancel buttons */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+
+/* Base button style shared by all action buttons */
+.action-btn {
+  width: 85px;
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+/* "📊 Report" button in the controls bar - dark background */
+.action-btn.report {
+  background-color: #2c3e50;
+  color: white;
+  margin-right: 8px;
+  border-radius: 10px;
+}
+
+.action-btn.report:hover {
+  background-color: #34495e;
+}
+
+/* Colour variants for each action type */
+.action-btn.edit   { background-color: #4C8BF5; color: white; }
+.action-btn.save   { background-color: #3CB371; color: white; }
+.action-btn.delete { background-color: #E53935; color: white; }
+.action-btn.cancel { background-color: #9E9E9E; color: white; }
+
+/* Slight scale on hover for all action buttons */
+.action-btn:hover { transform: scale(1.05); }
+
+
+/* ==========================================================================
+   9. MODALS (Delete confirmation + Duplicate detection)
+   Three modals exist in the template:
+   1. Delete Options modal - asks: remove payment only OR delete client entirely
+   2. Confirm Deletion modal - final confirmation before deleting
+   3. Duplicate Entry modal - shown when a duplicate record is detected
+   ========================================================================== */
+
+/* Full-screen dark overlay behind the modal box */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Always on top of everything */
+}
+
+/* White modal card centred in the overlay */
+.modal-box {
+  background: white;
+  padding: 30px;
+  border-radius: 14px;
+  width: 400px;
+  text-align: center;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+
+/* Button row at the bottom of the modal */
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+
+/* ==========================================================================
+   10. CUSTOM DROPDOWN & MULTI-SELECT
+   Used for surgeryType (multi-select with checkboxes)
+   and insuranceType (single-select custom dropdown).
+   Replaces the native <select> for better UX with long option lists.
+   ========================================================================== */
+
+/* Wrapper - relative positioning so the dropdown menu anchors below it */
+.multi-select-container {
+  position: relative;
+  width: 100%;
+}
+
+/* Read-only input that acts as the dropdown trigger - shows the current value */
+.multi-select-trigger {
+  cursor: pointer;
+  background-color: #fff;
+  /* Inline SVG chevron arrow on the right side */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M0 3l5 5 5-5z' fill='%23666'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding: 8px 25px 8px 10px !important; /* Right padding leaves room for the arrow */
+  text-align: left;
+  text-overflow: ellipsis;
+  border: 1.5px solid #ccc;
+  border-radius: 6px;
+  font-size: 13px;
+  display: block;
+  min-height: 35px;
+  box-sizing: border-box;
+}
+
+/* Floating dropdown panel that appears below the trigger input */
+.custom-dropdown-menu {
+  position: fixed;
+  width: 280px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Scrollable list of options inside the dropdown */
+.dropdown-list-items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 5px 0;
+  min-height: 0;
+}
+
+/* Individual option row - grid layout separates checkbox from label text */
+.dropdown-item {
+  display: grid !important;
+  grid-template-columns: 25px 1fr; /* 25px for checkbox, rest for text */
+  align-items: center;
+  justify-items: start;
+  padding: 10px 12px;
+  gap: 5px;
+  cursor: pointer;
+  transition: background 0.2s;
+  text-align: left;
+}
+
+.dropdown-item:hover { background-color: #f0f7ff; }
+
+/* Checkbox inside dropdown items - override table input styles that would break sizing */
+.dropdown-item input[type="checkbox"] {
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+  cursor: pointer;
+  accent-color: #1976d2;
+  border-radius: 4px !important;
+  border: 1px solid #ccc !important;
+}
+
+/* Option label text - allows wrapping for long surgery names */
+.dropdown-item span {
+  font-size: 13px;
+  line-height: 1.3;
+  color: #333;
+  white-space: normal;
+  text-align: left;
+  width: 100%;
+}

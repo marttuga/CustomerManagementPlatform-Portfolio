@@ -1,0 +1,39 @@
+================================================
+  Customer Management Platform
+  Usage Instructions
+================================================
+
+HOW TO USE THE APPLICATION
+
+1. Plug the USB pen drive into the computer
+
+2. Open the pen drive in Windows Explorer
+   (double-click the pen drive)
+
+3. Double-click "Open App.bat"
+   A black window will appear briefly -
+   this is normal, the server is starting.
+
+4. The browser opens automatically with the application.
+   If the browser does not open, go to:
+   http://localhost:5201
+
+5. When finished:
+   - Return to the black window
+   - Press any key
+   - Wait for the message "You can remove the pen drive"
+   - Only then remove the pen drive
+
+IMPORTANT
+
+! DO NOT use the application on two computers at
+  the same time - this can cause data loss.
+
+! DO NOT remove the pen drive without pressing the
+  key at the end - the data may not be saved.
+
++ Your data is automatically backed up
+  to Google Drive for safety.
+
++ If the pen drive is lost, the data is safe
+  on Google Drive and can be recovered.

@@ -1,0 +1,327 @@
+<!-- ==========================================================================
+     TABLE GENERIC
+     Reusable data table used on all location pages.
+     Receives: [title], [columns], [locationKey] as @Input() from LocationBaseComponent.
+     ========================================================================== -->
+
+<div class="table-wrapper">
+
+  <!-- ========================================================================
+       TABLE HEADER
+       Left: location title. Right: search input + report button + add button.
+       ======================================================================== -->
+  <div class="table-header">
+    <h2>{{ title }}</h2>
+
+    <div class="controls">
+
+      <!-- Search input - filters visible rows on every keystroke -->
+      <input
+        type="text"
+        placeholder="🔍 Search..."
+        [(ngModel)]="search"
+        (ngModelChange)="applyFilter()"
+      />
+
+      <!-- Report popover balloon - shown when showReportConfig is true.
+           Contains month/year selectors and a Confirm button. -->
+      <div *ngIf="showReportConfig" class="report-popover">
+        <div class="popover-content">
+
+          <!-- Month selector - value 13 means "Full Year" -->
+          <select [(ngModel)]="selectedReportMonth" class="report-select">
+            <option *ngFor="let m of months" [value]="m.value">
+              {{ m.name | titlecase }}
+            </option>
+          </select>
+
+          <!-- Year number input -->
+          <input
+            type="number"
+            [(ngModel)]="selectedReportYear"
+            class="report-year-input"
+          />
+
+          <!-- Confirm: triggers report generation and closes the popover -->
+          <button class="action-btn save confirm-report-btn"
+                  (click)="generateMonthlyReport(); showReportConfig = false">
+            Confirm
+          </button>
+        </div>
+      </div>
+
+      <!-- Report button - toggles the popover; shows spinner while loading -->
+      <button class="action-btn report" (click)="toggleReportConfig()" [disabled]="isLoading">
+        <span *ngIf="!isLoading">📊 Report</span>
+        <span *ngIf="isLoading" class="spinner"></span>
+      </button>
+
+      <!-- Add button - inserts a blank editable row at the top of the table -->
+      <button class="add-btn" (click)="addRow()">+ Add Payment</button>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       FEEDBACK MESSAGE BANNER
+       Green banner shown after save/delete or when a duplicate is detected.
+       Animation is disabled when the user is in duplicate-selection mode.
+       ======================================================================== -->
+  <div *ngIf="message"
+       class="message"
+       [style.animation]="isSelectingDuplicate ? 'none' : ''">
+    {{ message }}
+
+    <!-- Cancel button shown only during duplicate-selection mode -->
+    <button *ngIf="isSelectingDuplicate"
+            (click)="exitSelectionMode()"
+            class="action-btn cancel">
+      Cancel Selection
+    </button>
+  </div>
+
+  <!-- ========================================================================
+       TABLE SCROLL CONTAINER
+       This div scrolls independently - the header above stays fixed.
+       ======================================================================== -->
+  <div class="table-scroll-container" id="myScrollContainer">
+    <table class="styled-table">
+
+      <!-- Column headers - dynamically rendered from the [columns] input -->
+      <thead>
+        <tr>
+          <th *ngFor="let col of columns" [class.sorted]="sortColumn === col.field">
+            <div class="header-cell">
+              <!-- Clicking the label resets the current sort -->
+              <span class="header-label" (click)="resetSort()">{{ col.label }}</span>
+
+              <!-- Sort arrows - only shown for sortable columns -->
+              <ng-container *ngIf="col.sortable">
+                <div class="sort-wrapper-horizontal">
+                  <span class="arrow-btn"
+                        (click)="sortAsc(col.field)"
+                        [class.active]="sortColumn === col.field && sortDirection === 'asc'">▲</span>
+                  <span class="arrow-btn"
+                        (click)="sortDesc(col.field)"
+                        [class.active]="sortColumn === col.field && sortDirection === 'desc'">▼</span>
+                </div>
+              </ng-container>
+            </div>
+          </th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let row of filteredRows; let i = index">
+
+          <!-- ================================================================
+               DATA CELLS
+               When editIndex === i the row is in edit mode (inputs shown).
+               Otherwise the raw value is displayed as text.
+               ================================================================ -->
+          <td *ngFor="let col of columns">
+            <ng-container *ngIf="editIndex === i; else viewMode">
+              <ng-container [ngSwitch]="col.type">
+
+                <!-- Plain text input - name is auto-formatted on blur -->
+                <input *ngSwitchCase="'text'"
+                       [(ngModel)]="row[col.field]"
+                       (blur)="col.field === 'name' ? row.name = formatNameCoherently(row.name) : null" />
+
+                <!-- Date input -->
+                <input *ngSwitchCase="'date'" type="date" [(ngModel)]="row[col.field]" />
+
+                <!-- Dropdown - three variants depending on the field -->
+                <ng-container *ngSwitchCase="'dropdown'">
+
+                  <!-- paymentStatus: simple native select (Paid / Pending) -->
+                  <select *ngIf="col.field === 'paymentStatus'" [(ngModel)]="row[col.field]">
+                    <option *ngFor="let opt of col.options" [value]="opt">{{ opt }}</option>
+                  </select>
+
+                  <!-- surgeryType: custom multi-select with checkboxes -->
+                  <div *ngIf="col.field === 'surgeryType'" class="multi-select-container">
+                    <input
+                      type="text"
+                      [value]="row[col.field]"
+                      readonly
+                      placeholder="Surgeries..."
+                      (click)="toggleDropdown(i, col.field, $event)"
+                      class="multi-select-trigger"
+                    />
+                    <div class="custom-dropdown-menu" 
+                        *ngIf="activeDropdownIndex === i && activeDropdownField === col.field"
+                        [ngStyle]="{
+                          top: dropdownPosition.top + 'px',
+                          left: dropdownPosition.left + 'px',
+                          'max-height.px': dropdownPosition.maxHeight
+                        }">
+                      <div class="dropdown-search-box">
+                        <input type="text" [(ngModel)]="dropdownSearch"
+                               placeholder="Search..." (click)="$event.stopPropagation()">
+                      </div>
+                      <div class="dropdown-list-items">
+                        <div *ngFor="let opt of getFilteredOptions(col.options)"
+                             class="dropdown-item"
+                             (click)="toggleOption(row, col.field, opt, $event)">
+                          <input type="checkbox" [checked]="isOptionSelected(row[col.field], opt)">
+                          <span>{{ opt }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- All other dropdowns (e.g. insuranceType): custom single-select -->
+                  <ng-container *ngIf="col.field !== 'paymentStatus' && col.field !== 'surgeryType'">
+                    <div class="multi-select-container">
+                      <input
+                        type="text"
+                        [(ngModel)]="row[col.field]"
+                        readonly
+                        placeholder="Select option..."
+                        (click)="toggleDropdown(i, col.field, $event)"
+                        class="multi-select-trigger"
+                      />
+                      <div class="custom-dropdown-menu"
+                          *ngIf="activeDropdownIndex === i && activeDropdownField === col.field"
+                          [ngStyle]="{
+                            top: dropdownPosition.top + 'px',
+                            left: dropdownPosition.left + 'px',
+                            'max-height.px': dropdownPosition.maxHeight
+                          }">
+                        <div class="dropdown-search-box">
+                          <input type="text" [(ngModel)]="dropdownSearch"
+                                 placeholder="Search..." (click)="$event.stopPropagation()">
+                        </div>
+                        <div class="dropdown-list-items">
+                          <div *ngFor="let opt of getFilteredOptions(col.options)"
+                               class="dropdown-item single-select-item"
+                               [class.selected-item]="row[col.field] === opt"
+                               (click)="selectSingleOption(row, col.field, opt, $event)">
+                            <span>{{ opt }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </ng-container>
+
+                </ng-container>
+              </ng-container>
+            </ng-container>
+
+            <!-- View mode - plain text display -->
+            <ng-template #viewMode>
+              {{ row[col.field] }}
+            </ng-template>
+          </td>
+
+          <!-- ================================================================
+               ACTION BUTTONS CELL
+               View mode: Edit + Delete buttons.
+               Edit mode: Save (with spinner) + Cancel buttons.
+               ================================================================ -->
+          <td class="actions">
+            <ng-container *ngIf="editIndex !== i">
+              <button class="action-btn edit" (click)="startEdit(i)">Edit</button>
+              <button class="action-btn delete" (click)="openDeleteModal(i)">Delete</button>
+            </ng-container>
+
+            <ng-container *ngIf="editIndex === i">
+              <button class="action-btn save" (click)="saveRow(row)" [disabled]="isLoading">
+                <span *ngIf="isLoading" class="spinner"></span>
+                <span *ngIf="!isLoading">Save</span>
+              </button>
+              <button class="action-btn cancel" (click)="cancel()">Cancel</button>
+            </ng-container>
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- ============================================================================
+     MODAL 1 - DELETE OPTIONS (client model only)
+     Shown when Delete is clicked on a client row.
+     Asks: remove only this payment line, OR delete the entire client and history.
+     Not shown for daily entry locations (isDailyEntry = true).
+     ============================================================================ -->
+<div class="modal-backdrop"
+     *ngIf="actionModalIndex !== null && !confirmationModalType && !isDailyEntry">
+  <div class="modal-box">
+    <h3>Delete Options</h3>
+    <p>What would you like to remove for this client?</p>
+    <div class="modal-actions" style="flex-direction: column; gap: 10px;">
+      <!-- Removes only the payment row - client record is kept -->
+      <button class="action-btn edit"
+              (click)="confirmDeletePayment()"
+              style="width: 100%; background-color: #e6b465;">
+        Remove only this line
+      </button>
+      <!-- Deletes the client and all associated payments via cascade -->
+      <button class="action-btn delete" (click)="confirmDeleteEntity()" style="width: 100%;">
+        Delete Client & History
+      </button>
+      <button class="action-btn cancel" (click)="cancelActionModal()" style="width: 100%;">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================================
+     MODAL 2 - CONFIRM DELETION
+     Final confirmation step before the delete is executed.
+     Message varies depending on whether it is a payment or full entity deletion,
+     and whether the location uses the client or daily entry model.
+     ============================================================================ -->
+<div class="modal-backdrop" *ngIf="confirmationModalType">
+  <div class="modal-box">
+    <h3 [style.color]="'#E53935'">⚠️ Confirm Deletion</h3>
+
+    <!-- Client model messages -->
+    <ng-container *ngIf="!isDailyEntry">
+      <p *ngIf="confirmationModalType === 'payment'">
+        Are you sure you want to remove this line?
+      </p>
+      <p *ngIf="confirmationModalType === 'entity'"
+         style="font-weight: bold; color: #E53935;">
+        CRITICAL WARNING: This will permanently delete the Client and ALL their history.
+      </p>
+    </ng-container>
+
+    <!-- Daily entry model message -->
+    <p *ngIf="isDailyEntry" style="font-weight: bold; color: #E53935;">
+      Are you sure? This will delete the entire workday and its payment.
+    </p>
+
+    <p style="font-size: 11px; margin-top: 10px;">This action cannot be undone.</p>
+
+    <div class="modal-actions">
+      <button class="action-btn delete" (click)="confirmDeleteFinal()">Yes, delete</button>
+      <button class="action-btn cancel" (click)="cancelConfirmationModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================================
+     MODAL 3 - DUPLICATE ENTRY DETECTED
+     Shown when the save operation finds an existing record with the same key fields.
+     The user can choose to edit the existing duplicate or cancel.
+     ============================================================================ -->
+<div class="modal-backdrop" *ngIf="duplicateModalIndex !== null">
+  <div class="modal-box">
+    <h3>⚠️ Duplicate Entry</h3>
+    <p>A record with this information already exists for this date.</p>
+    <div class="modal-actions">
+      <!-- Switches to selection mode showing only the duplicate rows -->
+      <button class="action-btn edit" (click)="editExistingDuplicate()">Edit existing</button>
+      <button class="action-btn cancel" (click)="cancelDuplicateModal()">Cancel</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,188 @@
+/* ==========================================================================
+   DASHBOARD
+   Styles for the main dashboard page (/dashboard).
+   Contains the summary cards and the two Chart.js charts.
+   ========================================================================== */
+
+/* :host targets the <app-dashboard> element itself.
+   Scroll is handled here so the navbar stays fixed at the top
+   while the content below scrolls independently. */
+:host {
+  display: block;
+  height: 100vh;
+  overflow-y: auto !important; /* Vertical scroll lives inside this component */
+  overflow-x: hidden;          /* No horizontal scroll */
+  background-color: #f5f6fa;
+}
+
+/* ==========================================================================
+   LAYOUT
+   ========================================================================== */
+
+/* Outer wrapper - full height column layout holding the navbar + main content */
+.dashboard-wrapper {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background-color: #f5f6fa;
+  min-height: 100%; /* Follows scroll height, not fixed viewport */
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Main content area - centres children vertically in a column */
+.dashboard-main {
+  padding-top: 10px; /* Small gap below the navbar */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ==========================================================================
+   HEADER
+   Page title "Financial Dashboard" shown below the navbar.
+   ========================================================================== */
+.dashboard-header {
+  text-align: center;
+  margin: 15px 0;
+}
+
+.dashboard-header h1 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+/* ==========================================================================
+   SUMMARY CARDS
+   Three stat cards: Total Payments, Pending Payments, Total Records.
+   Rendered as a horizontal flex row, wrapping on small screens.
+   ========================================================================== */
+.stats-cards {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+/* Individual stat card */
+.card {
+  background-color: #ffffff;
+  padding: 15px 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  text-align: center;
+  width: 150px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+/* Card lifts on hover */
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+.card h3 {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+/* The numeric value shown in bold blue */
+.card p {
+  font-size: 20px;
+  font-weight: bold;
+  color: #1976d2;
+}
+
+/* ==========================================================================
+   CHARTS SECTION
+   Two Chart.js charts side by side:
+   - Left: pie chart (paid vs pending distribution)
+   - Right: bar chart (pending per location, marked with class "large")
+   ========================================================================== */
+.charts-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto 20px;
+}
+
+/* Shared chart card wrapper */
+.chart-container {
+  background-color: #ffffff;
+  padding: 15px 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  flex: 1 1 400px;
+  min-width: min(100%, 350px); /* Prevents overflow on split screens */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+/* Pie chart canvas - kept square with aspect-ratio 1/1 and max size */
+.chart-container canvas {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 350px;
+  aspect-ratio: 1 / 1;
+  max-width: 350px;
+}
+
+/* Bar chart wrapper - wider and fixed height so Chart.js renders correctly */
+.chart-container.large {
+  flex: 1 1 600px;
+  min-width: min(100%, 450px);
+  height: 350px; /* Fixed height required for Chart.js bar chart */
+}
+
+/* Bar chart canvas - fills the full height of its wrapper */
+.chart-container.large canvas {
+  height: 100% !important;
+  aspect-ratio: auto; /* Overrides the 1/1 ratio inherited from the pie chart rule */
+  max-width: 100%;
+}
+
+/* ==========================================================================
+   RESPONSIVE - TABLET (max 1024px)
+   ========================================================================== */
+@media (max-width: 1024px) {
+  /* Bar chart takes full width and shrinks slightly */
+  .chart-container.large {
+    flex: 1 1 100%;
+    height: 320px;
+  }
+}
+
+/* ==========================================================================
+   RESPONSIVE - MOBILE (max 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .dashboard-main {
+    padding-top: 40px;
+  }
+
+  /* Cards stack vertically */
+  .stats-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Charts stack vertically */
+  .charts-section {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Bar chart height reduced for mobile - pie chart is unaffected */
+  .chart-container.large {
+    height: 300px;
+  }
+}

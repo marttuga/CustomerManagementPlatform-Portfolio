@@ -1,0 +1,43 @@
+/* ==========================================================================
+   NAVBAR
+   Top navigation bar rendered on every page via <app-navbar>.
+   Contains buttons that link to the dashboard and each location page.
+   ========================================================================== */
+
+/* Main nav container - horizontal, centered, wraps on small screens */
+.location-navbar {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;         /* Wraps to next line on smaller screens */
+  gap: 20px;
+  width: 100%;
+  background-color: #fff;
+  padding: 15px 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Subtle shadow to separate nav from content */
+}
+
+/* Individual nav button - no default browser button styles */
+.location-navbar button {
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.3s, border-bottom 0.3s;
+  padding: 8px 12px;
+}
+
+/* Hover state - blue underline appears */
+.location-navbar button:hover {
+  color: #1976d2;
+  border-bottom: 2px solid #1976d2;
+}
+
+/* Active state - applied by Angular's routerLinkActive="active"
+   when the button's route matches the current URL */
+.location-navbar button.active {
+  color: #1976d2;
+  font-weight: 600;
+  border-bottom: 2px solid #1976d2;
+}

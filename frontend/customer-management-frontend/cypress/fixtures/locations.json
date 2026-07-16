@@ -1,0 +1,10 @@
+[
+  { "locationId": 1, "name": "Riverside",               "key": "riverside",               "clientCount": 18, "dailyEntriesCount": 0 },
+  { "locationId": 2, "name": "Hillcrest",              "key": "hillcrest",             "clientCount": 2,  "dailyEntriesCount": 0 },
+  { "locationId": 3, "name": "Oakdale",                 "key": "oakdale",                "clientCount": 1,  "dailyEntriesCount": 0 },
+  { "locationId": 4, "name": "Fairview",                   "key": "fairview",                  "clientCount": 0,  "dailyEntriesCount": 2 },
+  { "locationId": 5, "name": "Northgate",               "key": "northgate",              "clientCount": 0,  "dailyEntriesCount": 1 },
+  { "locationId": 6, "name": "Sunview",                  "key": "sunview",                 "clientCount": 0,  "dailyEntriesCount": 1 },
+  { "locationId": 7, "name": "Elmwood",   "key": "elmwood",  "clientCount": 0,  "dailyEntriesCount": 1 },
+  { "locationId": 8, "name": "Ashford",               "key": "ashford",              "clientCount": 0,  "dailyEntriesCount": 1 }
+]

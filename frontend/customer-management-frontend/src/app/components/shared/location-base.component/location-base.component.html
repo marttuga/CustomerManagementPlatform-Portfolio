@@ -1,0 +1,17 @@
+<!-- ==========================================================================
+     LOCATION BASE
+     Shell template for all location detail pages.
+     The locationKey from the URL route is resolved in the component class,
+     which looks up the correct column config and passes it to the table.
+     ========================================================================== -->
+
+<!-- Shared navigation bar -->
+<app-navbar></app-navbar>
+
+<!-- Generic table - receives title, columns and locationKey as inputs.
+     The table component handles all data loading, editing and deletion. -->
+<app-table-generic
+  [title]="locationName"
+  [columns]="columns"
+  [locationKey]="locationKey">
+</app-table-generic>

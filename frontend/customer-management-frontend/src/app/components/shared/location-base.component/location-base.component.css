@@ -1,0 +1,31 @@
+/* ==========================================================================
+   LOCATION BASE
+   Page wrapper for all location detail pages (/locations/:locationKey).
+   This component renders the navbar + the generic table below it.
+   The actual table styling lives in table-generic.component.css.
+   ========================================================================== */
+
+/* Full-height page background - matches the app's global background colour */
+.location-wrapper {
+  padding: 40px 0;
+  background-color: #f5f6fa;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Page title - currently not used in the template (title is passed to the table) */
+.location-wrapper h1 {
+  font-size: 30px;
+  margin-bottom: 5px;
+  color: #222;
+  font-weight: 600;
+}
+
+/* Subtitle or description text below the title - not currently used */
+.location-wrapper p {
+  color: #666;
+  margin-bottom: 25px;
+  font-size: 16px;
+}

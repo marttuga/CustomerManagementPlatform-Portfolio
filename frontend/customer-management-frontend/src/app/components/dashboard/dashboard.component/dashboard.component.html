@@ -1,0 +1,54 @@
+<!-- ==========================================================================
+     DASHBOARD
+     Main overview page showing payment statistics across all locations.
+     Data is loaded in DashboardComponent and rendered via Chart.js.
+     ========================================================================== -->
+<div class="dashboard-wrapper">
+
+  <!-- Shared navigation bar -->
+  <app-navbar></app-navbar>
+
+  <!-- Page title -->
+  <header class="dashboard-header">
+    <h1>Financial Dashboard</h1>
+  </header>
+
+  <main class="dashboard-main">
+
+    <!-- =======================================================================
+         SUMMARY CARDS
+         Three read-only cards showing totals computed from all locations.
+         Values are bound from the component: totalPayments, totalPending, totalRegistos.
+         ======================================================================= -->
+    <section class="stats-cards">
+      <div class="card">
+        <h3>Total Payments</h3>
+        <p>{{ totalPayments }}</p>
+      </div>
+      <div class="card">
+        <h3>Pending Payments</h3>
+        <p>{{ totalPending }}</p>
+      </div>
+      <div class="card">
+        <h3>Total Records</h3>
+        <p>{{ totalRegistos }}</p>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         CHARTS
+         Two Chart.js canvases referenced via @ViewChild in the component.
+         - #pieChart: paid vs pending distribution (circle chart)
+         - #barChart: pending count per location (bar chart, class "large")
+         ======================================================================= -->
+    <section class="charts-section">
+      <div class="chart-container">
+        <canvas #pieChart></canvas>
+      </div>
+      <div class="chart-container large">
+        <canvas #barChart></canvas>
+      </div>
+    </section>
+
+  </main>
+</div>
